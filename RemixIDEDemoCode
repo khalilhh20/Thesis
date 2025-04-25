@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SimpleVoting {
+    // Mapping from candidate name to vote count.
+    mapping (string => uint) public votesReceived;
+    
+    // List of candidates.
+    string[] public candidateList;
+    
+    // Mapping to track if an address has already voted.
+    mapping(address => bool) public hasVoted;
+    
+    // Constructor: initialize with a list of candidate names.
+    constructor(string[] memory candidateNames) {
+        candidateList = candidateNames;
+    }
+    
+    // Function to cast a vote.
+    function vote(string memory candidate) public {
+        require(!hasVoted[msg.sender], "You have already voted.");
+        require(validCandidate(candidate), "Candidate is not valid.");
+        votesReceived[candidate] += 1;
+        hasVoted[msg.sender] = true;
+    }
+    
+    // Helper function to check if a candidate is in the list.
+    function validCandidate(string memory candidate) public view returns (bool) {
+        for (uint i = 0; i < candidateList.length; i++) {
+            if (keccak256(bytes(candidateList[i])) == keccak256(bytes(candidate))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Function to get the list of candidates.
+    function getCandidateList() public view returns (string[] memory) {
+        return candidateList;
+    }
+}
